@@ -4,4 +4,4 @@
 ![scrot.png](scrot.png)
 
 ## Requirements
-* [https://github.com/sebbekarlsson/cengine](cengine)
+* [cengine](https://github.com/sebbekarlsson/cengine)
