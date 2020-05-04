@@ -90,6 +90,14 @@ void chunk_draw(chunk_T* chunk)
                 {
                     tex_y = 6;
                     tex_x = 1 + (int)MIN(1, block->electric);
+
+                    chunk_tick_electric(chunk, block, x, y, z);
+                }
+                else
+                if (block->type == BLOCK_LAMP)
+                {
+                    tex_y = 7;
+                    tex_x = 1 + (int)MIN(1, block->electric);
                 }
 
                 glBindVertexArray(scene->VAO);
@@ -121,6 +129,166 @@ static unsigned int block_is_source(block_T* block)
     return block->type == BLOCK_LEVER;
 }
 
+double to_positive_angle(double angle)
+{
+   angle = fmod(angle, 360);
+   if (angle < 0) angle += 360;
+   return angle;
+}
+
+static unsigned int electric_can_move(int prev_alt, int current_alt, int prev_angle, int current_angle)
+{
+    if (prev_alt == 0)
+        return 1;
+    
+    if (
+        prev_alt == BLOCK_WIRE_VERTICAL &&
+        (
+            current_alt == BLOCK_WIRE_VERTICAL ||
+            current_alt == BLOCK_WIRE_TOP_LEFT ||
+            current_alt == BLOCK_WIRE_TOP_RIGHT ||
+            current_alt == BLOCK_WIRE_BOTTOM_LEFT ||
+            current_alt == BLOCK_WIRE_BOTTOM_RIGHT
+        )
+     )
+    {
+        if (prev_angle == 270 && (current_alt == BLOCK_WIRE_TOP_RIGHT || current_alt == BLOCK_WIRE_TOP_LEFT))
+            return 0;
+
+        return prev_angle == current_angle;
+    }
+
+    if (
+        prev_alt == BLOCK_WIRE_HORIZONTAL &&
+        (
+            current_alt == BLOCK_WIRE_HORIZONTAL ||
+            current_alt == BLOCK_WIRE_TOP_LEFT ||
+            current_alt == BLOCK_WIRE_TOP_RIGHT ||
+            current_alt == BLOCK_WIRE_BOTTOM_LEFT ||
+            current_alt == BLOCK_WIRE_BOTTOM_RIGHT
+        )
+     )
+    {
+        if (prev_angle == 180 && (current_alt == BLOCK_WIRE_TOP_RIGHT || current_alt == BLOCK_WIRE_BOTTOM_RIGHT))
+            return 0;
+        return prev_angle == current_angle;
+    }
+
+     if (
+         prev_alt == BLOCK_WIRE_TOP_LEFT &&
+         (
+            current_alt == BLOCK_WIRE_HORIZONTAL ||
+            current_alt == BLOCK_WIRE_BOTTOM_RIGHT  ||
+            current_alt == BLOCK_WIRE_BOTTOM_LEFT  ||
+            current_alt == BLOCK_WIRE_VERTICAL
+         )
+     )
+     {
+         if (prev_angle == 180)
+             return current_angle == 270;
+
+         return current_angle == 0;
+     }
+
+    if (
+         prev_alt == BLOCK_WIRE_TOP_RIGHT &&
+         (
+            current_alt == BLOCK_WIRE_HORIZONTAL ||
+            current_alt == BLOCK_WIRE_BOTTOM_LEFT ||
+            current_alt == BLOCK_WIRE_BOTTOM_RIGHT ||
+            current_alt == BLOCK_WIRE_VERTICAL
+         )
+     )
+     {
+         if (prev_angle == 0)
+             return current_angle == 270;
+
+         return current_angle == 180;
+     }
+
+    if (
+         prev_alt == BLOCK_WIRE_BOTTOM_LEFT &&
+         (
+            current_alt == BLOCK_WIRE_HORIZONTAL ||
+            current_alt == BLOCK_WIRE_BOTTOM_LEFT ||
+            current_alt == BLOCK_WIRE_VERTICAL ||
+            current_alt == BLOCK_WIRE_TOP_RIGHT
+         )
+     )
+    {
+        if (prev_angle == 270)
+            return current_angle == 0;
+
+        return current_angle == 90;
+    }
+
+    if (
+         prev_alt == BLOCK_WIRE_BOTTOM_RIGHT &&
+         (
+            current_alt == BLOCK_WIRE_HORIZONTAL ||
+            current_alt == BLOCK_WIRE_BOTTOM_LEFT ||
+            current_alt == BLOCK_WIRE_VERTICAL ||
+            current_alt == BLOCK_WIRE_TOP_LEFT
+         )
+     )
+    {
+        if (prev_angle == 270)
+            return current_angle == 180;
+
+         return current_angle == 90;
+    }
+
+    return 0;
+}
+
+static unsigned int can_be_powered(block_T* block, unsigned int prev_alt)
+{
+    if (prev_alt == BLOCK_WIRE_HORIZONTAL || prev_alt == BLOCK_WIRE_VERTICAL)
+        return block->type == BLOCK_LAMP;
+
+    return 0;
+}
+
+void chunk_tick_electric(chunk_T* chunk, block_T* source, int x, int y, int z)
+{
+    int length = 8;
+
+    int px = x;
+    int py = y;
+    int prev_alt = 0;
+    int prev_v = 0;
+
+    const int angles[4] = {90, 0, 270, 180};
+
+    for (int i = 0; i < 8; i++)
+    {
+        block_T* old_block = (void*)0;
+
+        for (int j = 0; j < 4; j++)
+        {
+            int v = angles[j];
+            int xm = (int)(float)(px + (cos(glm_rad(v)) * 1.0f));
+            int ym = (int)(float)(py - (sin(glm_rad(v)) * 1.0f));
+
+            block_T* new_block = chunk->blocks[xm][ym][z];
+
+            if (new_block->type == BLOCK_WIRE || new_block->type == BLOCK_LAMP)
+            {
+                if (electric_can_move(prev_alt, new_block->alt, prev_v, v) || can_be_powered(new_block, prev_alt))
+                {
+                    prev_alt = new_block->alt;
+                    new_block->electric = source->electric;
+                    px = xm;
+                    py = ym;
+                    prev_v = v;
+                    old_block = new_block;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 static void chunk_tick_block_wire(
     chunk_T* chunk,
     block_T* block,
@@ -147,7 +315,7 @@ static void chunk_tick_block_wire(
         block->alt = BLOCK_WIRE_TOP_RIGHT;
 
     // update electricity
-    if (
+    /*if (
         ((block_left->alt == BLOCK_WIRE_HORIZONTAL || block_left->alt == BLOCK_WIRE_BOTTOM_LEFT || block_left->alt == BLOCK_WIRE_TOP_LEFT || block_is_source(block_left)) && block_left->electric) &&
         (block->alt == BLOCK_WIRE_HORIZONTAL || block->alt == BLOCK_WIRE_TOP_RIGHT || block->alt == BLOCK_WIRE_BOTTOM_RIGHT)
     )
@@ -175,7 +343,7 @@ static void chunk_tick_block_wire(
         (block_right->alt == BLOCK_WIRE_BOTTOM_RIGHT && block_right->electric) &&
         (block->alt == BLOCK_WIRE_TOP_LEFT || block->alt == BLOCK_WIRE_HORIZONTAL)        
     )
-        block->electric = 1;
+        block->electric = 1;*/
 }
 
 void chunk_tick_block(chunk_T* chunk, int x, int y, int z)

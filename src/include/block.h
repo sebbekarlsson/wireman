@@ -11,7 +11,8 @@ typedef struct BLOCK_STRUCT
         BLOCK_AIR = 0,
         BLOCK_STONE,
         BLOCK_WIRE,
-        BLOCK_LEVER
+        BLOCK_LEVER,
+        BLOCK_LAMP
     } type;
 
     enum

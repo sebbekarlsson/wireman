@@ -18,6 +18,7 @@ item_T* init_item(int type)
     {
         case ITEM_WIRE: tex_x = 1; tex_y = 2; item->block = BLOCK_WIRE; break;
         case ITEM_LEVER: tex_x = 1; tex_y = 6; item->block = BLOCK_LEVER; break;
+        case ITEM_LAMP: tex_x = 1; tex_y = 7; item->block = BLOCK_LAMP; break;
         default: /* silence */ break;
     }
 

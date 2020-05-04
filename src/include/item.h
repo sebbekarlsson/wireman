@@ -8,7 +8,8 @@ typedef struct ITEM_STRUCT
     enum
     {
         ITEM_WIRE,
-        ITEM_LEVER
+        ITEM_LEVER,
+        ITEM_LAMP
     } type;
 
     int block;

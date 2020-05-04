@@ -20,4 +20,6 @@ void chunk_tick(chunk_T* chunk);
 void chunk_draw(chunk_T* chunk);
 
 void chunk_tick_block(chunk_T* chunk, int x, int y, int z);
+
+void chunk_tick_electric(chunk_T* chunk, block_T* source, int x, int y, int z);
 #endif

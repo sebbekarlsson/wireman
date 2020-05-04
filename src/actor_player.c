@@ -27,6 +27,7 @@ actor_player_T* init_actor_player(float x, float y, float z)
     actor_player->inventory = init_inventory();
     actor_player->inventory->slots[0] = (inventory_slot_T){init_item(ITEM_WIRE), 1};
     actor_player->inventory->slots[1] = (inventory_slot_T){init_item(ITEM_LEVER), 1};
+    actor_player->inventory->slots[2] = (inventory_slot_T){init_item(ITEM_LAMP), 1};
     
     texture_T* texture_down = init_texture(TEXTURE_ENTITY_SHEET->id, TEXTURE_ENTITY_SHEET->width, TEXTURE_ENTITY_SHEET->height);
     texture_down->atlas_width = 16;
