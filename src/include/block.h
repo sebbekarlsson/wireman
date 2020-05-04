@@ -27,6 +27,7 @@ typedef struct BLOCK_STRUCT
     } alt;
 
     unsigned int electric;
+    unsigned int charged;
     double last_update;
 } block_T;
 

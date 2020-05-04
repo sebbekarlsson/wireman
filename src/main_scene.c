@@ -33,8 +33,29 @@ main_scene_T* init_main_scene()
 void main_scene_tick(scene_T* scene)
 {
     main_scene_T* main_scene = (main_scene_T*) scene;
+    
+    actor_T* actor_camera = (actor_T*) scene->camera;
 
     inventory_tick(main_scene->player->inventory);
+
+    for (int x = 0; x < NR_CHUNKS; x++)
+    {
+        for (int y = 0; y < NR_CHUNKS; y++)
+        {
+            chunk_T* chunk = main_scene->chunks[x][y];
+
+            if (
+                chunk->x + (CHUNK_SIZE*32) < actor_camera->x ||
+                chunk->x > actor_camera->x + RES_WIDTH ||
+
+                chunk->y > actor_camera->y + RES_HEIGHT ||
+                chunk->y + (CHUNK_SIZE*32) < actor_camera->y
+            )
+                continue;
+
+            chunk_tick(chunk);
+        }
+    }
 
     ((actor_T*)scene->camera)->x = (((actor_T*)main_scene->player)->x - RES_WIDTH/2) + 32/2;
     ((actor_T*)scene->camera)->y = (((actor_T*)main_scene->player)->y - RES_HEIGHT/2) + 32/2;

@@ -9,6 +9,7 @@ block_T* init_block(int type)
     block->type = type;
     block->alt = 0;
     block->electric = 0;
+    block->charged = 0;
     block->last_update = application_get_time();
 
     return block;

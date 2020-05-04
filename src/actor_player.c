@@ -140,19 +140,4 @@ void actor_player_tick(actor_T* self)
 
 void actor_player_draw(actor_T* self)
 {
-
-    // Just drawing a cross for demonstrational purposes
-
-    draw_line(
-        self->draw_program,
-        self->x, self->y + self->hitbox_height/2, self->z,
-        self->x + self->hitbox_width, self->y + self->hitbox_height/2, self->z,
-        255, 0, 0, 1.0f 
-    );
-    draw_line(
-        self->draw_program,
-        self->x + self->hitbox_width/2, self->y, self->z,
-        self->x + self->hitbox_width/2, self->y + self->hitbox_height, self->z,
-        255, 0, 0, 1.0f 
-    );
 }

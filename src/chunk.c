@@ -25,7 +25,22 @@ chunk_T* init_chunk(int x, int y)
 }
 
 void chunk_tick(chunk_T* chunk)
-{ 
+{
+    for (int x = 0; x < 16; x++)
+    {
+        for (int y = 0; y < 16; y++)
+        {
+            for (int z = 0; z < 2; z++)
+            {
+                block_T* block = chunk->blocks[x][y][z];
+
+                if (block->type == BLOCK_AIR)
+                    continue;
+
+                chunk_tick_block(chunk, x, y, z);
+            }
+        }
+    }
 }
 
 void chunk_draw(chunk_T* chunk)
@@ -59,8 +74,6 @@ void chunk_draw(chunk_T* chunk)
                 if (block->type == BLOCK_AIR)
                     continue;
 
-                chunk_tick_block(chunk, x, y, z);
-                
                 int tex_x = 0;
                 int tex_y = 0;
             
@@ -90,8 +103,6 @@ void chunk_draw(chunk_T* chunk)
                 {
                     tex_y = 6;
                     tex_x = 1 + (int)MIN(1, block->electric);
-
-                    chunk_tick_electric(chunk, block, x, y, z);
                 }
                 else
                 if (block->type == BLOCK_LAMP)
@@ -136,8 +147,15 @@ double to_positive_angle(double angle)
    return angle;
 }
 
-static unsigned int electric_can_move(int prev_alt, int current_alt, int prev_angle, int current_angle)
+static unsigned int electric_can_move(int prev_alt, int current_type, int current_alt, int prev_angle, int current_angle)
 {
+    if (current_type == BLOCK_AIR)
+        return 0;
+
+    if (prev_alt == BLOCK_WIRE_HORIZONTAL || prev_alt == BLOCK_WIRE_VERTICAL)
+        if (current_type == BLOCK_LAMP)
+            return 1;
+
     if (prev_alt == 0)
         return 1;
     
@@ -241,14 +259,6 @@ static unsigned int electric_can_move(int prev_alt, int current_alt, int prev_an
     return 0;
 }
 
-static unsigned int can_be_powered(block_T* block, unsigned int prev_alt)
-{
-    if (prev_alt == BLOCK_WIRE_HORIZONTAL || prev_alt == BLOCK_WIRE_VERTICAL)
-        return block->type == BLOCK_LAMP;
-
-    return 0;
-}
-
 void chunk_tick_electric(chunk_T* chunk, block_T* source, int x, int y, int z)
 {
     int length = 8;
@@ -262,8 +272,6 @@ void chunk_tick_electric(chunk_T* chunk, block_T* source, int x, int y, int z)
 
     for (int i = 0; i < 8; i++)
     {
-        block_T* old_block = (void*)0;
-
         for (int j = 0; j < 4; j++)
         {
             int v = angles[j];
@@ -272,18 +280,17 @@ void chunk_tick_electric(chunk_T* chunk, block_T* source, int x, int y, int z)
 
             block_T* new_block = chunk->blocks[xm][ym][z];
 
-            if (new_block->type == BLOCK_WIRE || new_block->type == BLOCK_LAMP)
+            if (electric_can_move(prev_alt, new_block->type, new_block->alt, prev_v, v))
             {
-                if (electric_can_move(prev_alt, new_block->alt, prev_v, v) || can_be_powered(new_block, prev_alt))
-                {
-                    prev_alt = new_block->alt;
-                    new_block->electric = source->electric;
-                    px = xm;
-                    py = ym;
-                    prev_v = v;
-                    old_block = new_block;
-                    break;
-                }
+                prev_alt = new_block->alt;
+
+                new_block->charged = source->electric;
+
+                px = xm;
+                py = ym;
+                prev_v = v;
+
+                break;
             }
         }
     }
@@ -313,6 +320,8 @@ static void chunk_tick_block_wire(
         block->alt = BLOCK_WIRE_TOP_LEFT;
     if (block_down->type == BLOCK_WIRE && block_left->type == BLOCK_WIRE)
         block->alt = BLOCK_WIRE_TOP_RIGHT;
+
+    block->electric = block->charged;
 
     // update electricity
     /*if (
@@ -363,6 +372,7 @@ void chunk_tick_block(chunk_T* chunk, int x, int y, int z)
     switch (block->type)
     {
         case BLOCK_WIRE: chunk_tick_block_wire(chunk, block, block_left, block_right, block_up, block_down); break;
+        case BLOCK_LEVER: chunk_tick_electric(chunk, block, x, y, z); break;
         default: /* silence */ break;
     }
 
