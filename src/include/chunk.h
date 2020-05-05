@@ -3,7 +3,7 @@
 #include <cengine/draw.h>
 #include "block.h"
 
-#define CHUNK_SIZE 16
+#define CHUNK_SIZE 8
 
 typedef struct CHUNK_STRUCT
 {

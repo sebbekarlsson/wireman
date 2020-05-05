@@ -5,6 +5,8 @@
 #include <sys/param.h>
 
 
+extern texture_T* TEXTURE_ENTITY_SHEET;
+
 main_scene_T* init_main_scene()
 {
     main_scene_T* main_scene = calloc(1, sizeof(struct MAIN_SCENE_STRUCT));
@@ -19,10 +21,21 @@ main_scene_T* init_main_scene()
             main_scene->chunks[x][y] = init_chunk(x*32*CHUNK_SIZE, y*32*CHUNK_SIZE);
 
 
-    for (int x = 0; x < CHUNK_SIZE; x++)
-        for (int y = 0; y < CHUNK_SIZE; y++)
+    for (int x = 0; x < CHUNK_SIZE*2; x++)
+    {
+        for (int y = 0; y < CHUNK_SIZE*2; y++)
+        {
             main_scene_set_block(main_scene, x*BLOCK_SIZE, y*BLOCK_SIZE, 0, BLOCK_STONE);
+            main_scene_set_block(main_scene, x*BLOCK_SIZE, y*BLOCK_SIZE, 1, BLOCK_AIR);
 
+            if ((y == 0 && x < CHUNK_SIZE) || (y == CHUNK_SIZE-1 && x < CHUNK_SIZE) || (x == 0 && y < CHUNK_SIZE) || (x == CHUNK_SIZE-1 && y < CHUNK_SIZE))
+                main_scene_set_block(main_scene, x*BLOCK_SIZE, y*BLOCK_SIZE, 1, BLOCK_STONE);
+        }
+    }
+
+
+    main_scene_set_block(main_scene, (CHUNK_SIZE-1)*BLOCK_SIZE, 4*BLOCK_SIZE, 1, BLOCK_DOOR)->alt = BLOCK_DOOR_VERTICAL;
+    
     main_scene->player = init_actor_player(BLOCK_SIZE*4, BLOCK_SIZE*4, 2.0f);
     scene_add_actor(scene, (actor_T*) main_scene->player);
 
@@ -96,6 +109,32 @@ void main_scene_post_draw(scene_T* scene)
     main_scene_T* main_scene = (main_scene_T*) scene;
 
     inventory_draw(main_scene->player->inventory);
+
+    for (int i = 0; i < (int)(main_scene->player->health * 0.05f); i++)
+    {
+        int texture_width = 32;
+        int texture_height = 32;
+
+        glBindVertexArray(scene->VAO);
+
+        draw_texture(
+            scene->draw_program,
+            TEXTURE_ENTITY_SHEET->id,
+            8 + ((texture_width+1)*4) + (((32 + 1) * i)), ((RES_HEIGHT-32) - 8), 4.0f,
+            texture_width,
+            texture_height,
+            255,
+            255,
+            255,
+            1.0f,
+            0,
+            14,
+            16,
+            16,
+            0,
+            0
+        );
+    }
 }
 
 static int mod(int x, int N)
@@ -118,18 +157,21 @@ block_T* main_scene_get_block(main_scene_T* main_scene, float x, float y, float 
     int bx = mod(x/32, CHUNK_SIZE);
     int by = mod(y/32, CHUNK_SIZE);
 
-    return chunk->blocks[MIN(CHUNK_SIZE, bx)][MIN(CHUNK_SIZE, by)][MIN(2, (int)z)];
+    return chunk->blocks[MIN(CHUNK_SIZE-1, bx)][MIN(CHUNK_SIZE-1, by)][MIN(2, (int)z)];
 }
 
-void main_scene_set_block(main_scene_T* main_scene, float x, float y, float z, int type)
+block_T* main_scene_set_block(main_scene_T* main_scene, float x, float y, float z, int type)
 {
     chunk_T* chunk = main_scene_get_chunk(main_scene, x, y);
 
     int bx = mod(x/32, CHUNK_SIZE);
     int by = mod(y/32, CHUNK_SIZE);
 
-    block_T* block = chunk->blocks[MIN(CHUNK_SIZE, bx)][MIN(CHUNK_SIZE, by)][MIN(2, (int)z)];
+    block_T* block = chunk->blocks[MIN(CHUNK_SIZE-1, bx)][MIN(CHUNK_SIZE-1, by)][MIN(2, (int)z)];
     block->type = type;
     block->electric = 0;
     block->alt = 0;
+    block_set_solid(block, block->type);
+
+    return block;
 }

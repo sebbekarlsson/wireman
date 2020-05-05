@@ -26,5 +26,5 @@ chunk_T* main_scene_get_chunk(main_scene_T* main_scene, float x, float y);
 
 block_T* main_scene_get_block(main_scene_T* main_scene, float x, float y, float z);
 
-void main_scene_set_block(main_scene_T* main_scene, float x, float y, float z, int type);
+block_T* main_scene_set_block(main_scene_T* main_scene, float x, float y, float z, int type);
 #endif

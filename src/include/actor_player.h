@@ -12,6 +12,8 @@ typedef struct ACTOR_PLAYER_STRUCT
     sprite_T* sprite_up;
 
     inventory_T* inventory;
+
+    float health;
 } actor_player_T;
 
 actor_player_T* init_actor_player(float x, float y, float z);
