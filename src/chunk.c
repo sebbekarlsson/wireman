@@ -239,73 +239,7 @@ static unsigned int electric_can_move(int prev_alt, int current_type, int curren
     return 0;
 }
 
-void chunk_tick_electric(chunk_T* chunk, block_T* source, int x, int y, int z)
-{
-    int length = 8;
 
-    int px = x;
-    int py = y;
-    int prev_alt = 0;
-    int prev_v = 0;
-
-    const int angles[4] = {90, 0, 270, 180};
-
-    for (int i = 0; i < length; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            int v = angles[j];
-            int xm = (int)(float)(px + (cos(glm_rad(v)) * 1.0f));
-            int ym = (int)(float)(py - (sin(glm_rad(v)) * 1.0f));
-
-            block_T* new_block = chunk->blocks[MAX(0, MIN(CHUNK_SIZE-1, xm))][MAX(0, MIN(CHUNK_SIZE-1, ym))][z];
-
-            if (electric_can_move(prev_alt, new_block->type, new_block->alt, prev_v, v))
-            {
-                prev_alt = new_block->alt;
-
-                new_block->charged = source->electric;
-
-                px = xm;
-                py = ym;
-                prev_v = v;
-
-                break;
-            }
-        }
-    }
-}
-
-static void chunk_tick_block_wire(
-    chunk_T* chunk,
-    block_T* block,
-    block_T* block_left,
-    block_T* block_right,
-    block_T* block_up,
-    block_T* block_down
-)
-{
-    block->alt = BLOCK_WIRE_VERTICAL;
-
-    // update alternatives
-    if (block_left->type == BLOCK_WIRE || block_right->type == BLOCK_WIRE)
-        block->alt = BLOCK_WIRE_HORIZONTAL;
-    if (block_up->type == BLOCK_WIRE)
-        block->alt = BLOCK_WIRE_VERTICAL;
-    if (block_up->type == BLOCK_WIRE && block_right->type == BLOCK_WIRE)
-        block->alt = BLOCK_WIRE_BOTTOM_LEFT;
-    if (block_up->type == BLOCK_WIRE && block_left->type == BLOCK_WIRE)
-        block->alt = BLOCK_WIRE_BOTTOM_RIGHT;
-    if (block_down->type == BLOCK_WIRE && block_right->type == BLOCK_WIRE)
-        block->alt = BLOCK_WIRE_TOP_LEFT;
-    if (block_down->type == BLOCK_WIRE && block_left->type == BLOCK_WIRE)
-        block->alt = BLOCK_WIRE_TOP_RIGHT;
-}
-
-static void chunk_tick_block_door(block_T* block)
-{
-    block->solid = !block->electric;
-}
 
 void chunk_tick_block(chunk_T* chunk, int x, int y, int z)
 {
@@ -316,23 +250,13 @@ void chunk_tick_block(chunk_T* chunk, int x, int y, int z)
     if ((current_time - block->last_update) < 0.5f)
         return;
 
-    if (block->type != BLOCK_LEVER)
-        block->electric = block->charged;
-
     block_T* block_left = chunk->blocks[MAX(0, x-1)][y][z];
     block_T* block_right = chunk->blocks[MIN(CHUNK_SIZE-1, x+1)][y][z];
     block_T* block_up = chunk->blocks[x][MAX(0, y-1)][z];
     block_T* block_down = chunk->blocks[x][MIN(CHUNK_SIZE-1, y+1)][z];
 
-    switch (block->type)
-    {
-        case BLOCK_WIRE: chunk_tick_block_wire(chunk, block, block_left, block_right, block_up, block_down); break;
-        case BLOCK_LEVER: chunk_tick_electric(chunk, block, x, y, z); break;
-        case BLOCK_DOOR: chunk_tick_block_door(block); break;
-        default: /* silence */ break;
-    }
-
     block_tick(block);
+    block_update(block, chunk, x, y, z);
 
     block->last_update = application_get_time(APP);
 }

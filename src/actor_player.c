@@ -172,8 +172,13 @@ void actor_player_tick(actor_T* self)
         
         if (slot.block_type != BLOCK_AIR)
         {
-            main_scene_set_block(main_scene, self->x + 32/2, self->y + 32/2, 1, slot.block_type);
-            player->inventory->slots[player->inventory->index] = (inventory_slot_T){slot.block_type, slot.quantity-1};
+            block_T* block = main_scene_get_block(main_scene, self->x +32/2, self->y + 32/2, 1);
+
+            if (block->type == BLOCK_AIR)
+            {
+                main_scene_set_block(main_scene, self->x + 32/2, self->y + 32/2, 1, slot.block_type);
+                player->inventory->slots[player->inventory->index] = (inventory_slot_T){slot.block_type, slot.quantity-1};
+            }
         }
     }
 
@@ -193,7 +198,12 @@ void actor_player_tick(actor_T* self)
         block_T* block = main_scene_get_block(main_scene, self->x +32/2, self->y + 32/2, 1);
 
         if (block->type == BLOCK_LEVER)
-            block->electric = !block->electric;
+        {
+            if (block->charge == 0)
+                block->charge = BLOCK_MAX_CHARGE;
+            else
+                block->charge = 0;
+        }
     }
 
     if (self->dx > 0)

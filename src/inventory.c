@@ -79,7 +79,7 @@ void inventory_draw(inventory_T* inventory)
 
         int item_tex_x;
         int item_tex_y;
-        get_block_atlascoords(slot.block_type, BLOCK_NO_ALT, &item_tex_x, &item_tex_y);
+        get_block_atlascoords(slot.block_type, BLOCK_NO_ALT, 0, &item_tex_x, &item_tex_y);
 
         int texture_width = 16;
         int texture_height = 16;

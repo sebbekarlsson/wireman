@@ -169,7 +169,7 @@ block_T* main_scene_set_block(main_scene_T* main_scene, float x, float y, float 
 
     block_T* block = chunk->blocks[MIN(CHUNK_SIZE-1, bx)][MIN(CHUNK_SIZE-1, by)][MIN(2, (int)z)];
     block->type = type;
-    block->electric = 0;
+    block->charge = 0;
     block->alt = 0;
     block_set_solid(block, block->type);
 

@@ -5,6 +5,7 @@
 
 #define BLOCK_SIZE 32
 #define NR_BLOCKS 2
+#define BLOCK_MAX_CHARGE 8
 
 typedef struct BLOCK_STRUCT
 {
@@ -33,8 +34,7 @@ typedef struct BLOCK_STRUCT
         BLOCK_DOOR_HORIZONTAL
     } alt;
 
-    unsigned int electric;
-    unsigned int charged;
+    unsigned int charge;
     unsigned int solid;
     double last_update;
 
@@ -43,7 +43,9 @@ typedef struct BLOCK_STRUCT
 
 block_T* init_block(int type);
 
-void get_block_atlascoords(int type, int alt, int* x, int* y);
+void get_block_atlascoords(int type, int alt, int charge, int* x, int* y);
+
+void block_update(block_T* block, void* chunkptr, int x, int y, int z);
 
 void block_tick(block_T* block);
 

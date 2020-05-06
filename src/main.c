@@ -8,6 +8,7 @@ extern application_T* APP;
 
 texture_T* TEXTURE_SHEET;
 texture_T* TEXTURE_ENTITY_SHEET;
+texture_T* TEXTURE_EFFECTS_SHEET;
 
 
 int main(int argc, char* argv[])
@@ -16,6 +17,7 @@ int main(int argc, char* argv[])
 
     TEXTURE_SHEET = texture_get("res/img/sheet.png");
     TEXTURE_ENTITY_SHEET = texture_get("res/img/entity_sheet.png");
+    TEXTURE_EFFECTS_SHEET = texture_get("res/img/effects_sheet.png");
 
     application_add_scene(APP, (scene_T*) init_main_scene());
 
