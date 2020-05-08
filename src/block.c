@@ -2,6 +2,7 @@
 #include "include/chunk.h"
 #include "include/main_scene.h"
 #include "include/actor_effect.h"
+#include "include/actor_particle.h"
 #include <cengine/application.h>
 #include <stdlib.h>
 #include <sys/param.h>
@@ -118,6 +119,11 @@ void block_update(block_T* block, void* chunkptr, int x, int y, int z)
             block->type = BLOCK_AIR;
             block->charge = 0;
             block->alt = 0;
+
+            for (int i = 0; i < 100; i++)
+            {
+                scene_add_actor(scene, (actor_T*) init_actor_particle(chunk->x + (x*BLOCK_SIZE) + BLOCK_SIZE/2, chunk->y + (y*BLOCK_SIZE) + BLOCK_SIZE/2, 3.0f));
+            }
         }
     }
 }
