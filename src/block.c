@@ -18,6 +18,7 @@ block_T* init_block(int type)
     block->alt = 0;
     block->charge = 0;
     block->last_update = application_get_time();
+    block->charge_dir = CHARGE_DIR_NONE;
     block_set_solid(block, type);
 
     block->texture = init_texture(TEXTURE_SHEET->id, 32, 32);
@@ -94,18 +95,38 @@ void block_update(block_T* block, void* chunkptr, int x, int y, int z)
     if (block->type != BLOCK_AIR && block->type != BLOCK_LEVER)
     {
         block->charge = 0;
+        block_T* source_block = (void*) 0;
+        int dir = CHARGE_DIR_NONE;
+
+        if (block_left->charge > block_right->charge && block_left->charge > block_down->charge && block_left->charge > block_up->charge)
+        {
+            source_block = block_left;
+            dir = CHARGE_DIR_RIGHT;
+        }
 
         if (block_right->charge > block_left->charge && block_right->charge > block_down->charge && block_right->charge > block_up->charge)
-            block->charge = MAX(0, (block_right->charge - 1));
-
-        if (block_left->charge > block_right->charge && block_left->charge > block_down->charge && block_left->charge > block_up->charge )
-            block->charge = MAX(0, (block_left->charge - 1));
+        {
+            source_block = block_right;
+            dir = CHARGE_DIR_LEFT;
+        }
 
         if (block_up->charge > block_down->charge && block_up->charge > block_left->charge && block_up->charge > block_right->charge)
-            block->charge = MAX(0, (block_up->charge - 1));
+        {
+            source_block = block_up;
+            dir = CHARGE_DIR_DOWN;
+        }
 
         if (block_down->charge > block_up->charge && block_down->charge > block_left->charge && block_down->charge > block_right->charge)
-            block->charge = MAX(0, (block_down->charge - 1));
+        {
+            source_block = block_down;
+            dir = CHARGE_DIR_UP;
+        }
+
+        if (source_block != (void*)0)
+        {
+            block->charge = MAX(0, (source_block->charge - 1));
+            block->charge_dir = dir;
+        }
     }
 
     if (block->type == BLOCK_DOOR)

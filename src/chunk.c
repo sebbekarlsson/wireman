@@ -5,6 +5,7 @@
 #include <sys/param.h>
 
 extern texture_T* TEXTURE_SHEET;
+extern texture_T* TEXTURE_ENTITY_SHEET;
 extern application_T* APP;
 
 
@@ -112,6 +113,29 @@ void chunk_draw(chunk_T* chunk)
                     0,
                     0
                 );
+
+                if (block->type == BLOCK_WIRE && block->charge_dir != CHARGE_DIR_NONE)
+                {
+                    glBindVertexArray(scene->VAO);
+                    draw_texture_rotated(
+                        chunk->draw_program,
+                        TEXTURE_ENTITY_SHEET->id,
+                        chunk->x + (x*BLOCK_SIZE) + 8, chunk->y + (y*BLOCK_SIZE) + 8, z+1,
+                        16,
+                        16,
+                        255,
+                        255,
+                        255,
+                        1.0f,
+                        15,
+                        0,
+                        16,
+                        16,
+                        0,
+                        0,
+                        block->charge_dir == CHARGE_DIR_LEFT ? 0 : block->charge_dir == CHARGE_DIR_UP ? 90 : block->charge_dir == CHARGE_DIR_RIGHT ? 180 : block->charge_dir == CHARGE_DIR_DOWN ? 270 : 0
+                    );
+                }
             }
         }
     }

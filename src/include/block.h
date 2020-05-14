@@ -35,6 +35,17 @@ typedef struct BLOCK_STRUCT
     } alt;
 
     unsigned int charge;
+
+
+    enum
+    {
+        CHARGE_DIR_NONE,
+        CHARGE_DIR_LEFT,
+        CHARGE_DIR_RIGHT,
+        CHARGE_DIR_UP,
+        CHARGE_DIR_DOWN
+    } charge_dir;
+
     unsigned int solid;
     double last_update;
 
