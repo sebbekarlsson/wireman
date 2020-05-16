@@ -117,9 +117,9 @@ void inventory_draw(inventory_T* inventory)
         draw_options_text.y = ((RES_HEIGHT-32) - 8) + texture_height / 2;
         draw_options_text.z = 5.0f;
         draw_options_text.font_size = 8;
-        draw_options.r = 255;
-        draw_options.g = 255;
-        draw_options.b = 255;
+        draw_options_text.r = 255;
+        draw_options_text.g = 255;
+        draw_options_text.b = 255;
 
         draw_text(
             inventory->draw_program_text,
