@@ -56,22 +56,24 @@ void inventory_draw(inventory_T* inventory)
         if (i == inventory->index)
             tex_x = 1;
 
+        draw_options_T draw_options0 = DRAW_OPTIONS_INIT;
+        draw_options0.texture = TEXTURE_ENTITY_SHEET->id;
+        draw_options0.x = 8 + ((32 + 1) * i);
+        draw_options0.y = (RES_HEIGHT-32) - 8;
+        draw_options0.z = 3.0f;
+        draw_options0.width = 32;
+        draw_options0.height = 32;
+        draw_options0.r = 255;
+        draw_options0.g = 255;
+        draw_options0.b = 255;
+        draw_options0.shift_x = tex_x;
+        draw_options0.shift_y = tex_y;
+        draw_options0.atlas_width = 16;
+        draw_options0.atlas_height = 16;
+
         draw_texture(
             inventory->draw_program,
-            TEXTURE_ENTITY_SHEET->id,
-            8 + ((32 + 1) * i), (RES_HEIGHT-32) - 8, 3.0f,
-            32,
-            32,
-            255,
-            255,
-            255,
-            1.0f,
-            tex_x,
-            tex_y,
-            16,
-            16,
-            0,
-            0
+            draw_options0
         );
         
         if (slot.block_type == BLOCK_AIR)
@@ -84,35 +86,44 @@ void inventory_draw(inventory_T* inventory)
         int texture_width = 16;
         int texture_height = 16;
 
+        draw_options_T draw_options = DRAW_OPTIONS_INIT;
+        draw_options.texture = TEXTURE_SHEET->id;
+        draw_options.x = 8 + (((32 + 1) * i) + texture_width / 2);
+        draw_options.y = ((RES_HEIGHT-32) - 8) + texture_height / 2;
+        draw_options.z = 4.0f;
+        draw_options.width = texture_width;
+        draw_options.height = texture_height;
+        draw_options.r = 255;
+        draw_options.g = 255;
+        draw_options.b = 255;
+        draw_options.shift_x = item_tex_x;
+        draw_options.shift_y = item_tex_y;
+        draw_options.atlas_width = 16;
+        draw_options.atlas_height = 16;
+
         draw_texture(
             inventory->draw_program,
-            TEXTURE_SHEET->id,
-            8 + (((32 + 1) * i) + texture_width / 2), ((RES_HEIGHT-32) - 8) + texture_height / 2, 4.0f,
-            texture_width,
-            texture_height,
-            255,
-            255,
-            255,
-            1.0f,
-            item_tex_x,
-            item_tex_y,
-            16,
-            16,
-            0,
-            0
+            draw_options
         );
 
         const char* nr_items_template = "%d";
         char* nr_items = calloc(256, sizeof(char));
         sprintf(nr_items, nr_items_template, slot.quantity);
-        
+
+        draw_options_T draw_options_text = DRAW_OPTIONS_INIT;
+        draw_options_text.text = nr_items;
+        draw_options_text.fontpath = "/usr/local/share/fonts/AGoblinAppears-o2aV.ttf";
+        draw_options_text.x = 8 + (((32 + 1) * i) + texture_width / 2);
+        draw_options_text.y = ((RES_HEIGHT-32) - 8) + texture_height / 2;
+        draw_options_text.z = 5.0f;
+        draw_options_text.font_size = 8;
+        draw_options.r = 255;
+        draw_options.g = 255;
+        draw_options.b = 255;
+
         draw_text(
             inventory->draw_program_text,
-            nr_items,
-            "/usr/local/share/fonts/AGoblinAppears-o2aV.ttf",
-            8 + (((32 + 1) * i) + texture_width / 2), ((RES_HEIGHT-32) - 8) + texture_height / 2, 5.0f,
-            8,
-            255, 255, 255
+            draw_options_text
         );
 
         free(nr_items);

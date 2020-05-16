@@ -57,12 +57,18 @@ void actor_particle_draw(actor_T* self)
     actor_particle_T* particle = (actor_particle_T*) self;
     scene_T* scene = application_get_current_scene(APP);
 
-    //glBindVertexArray(scene->VAO);
+    draw_options_T draw_options = DRAW_OPTIONS_INIT;
+    draw_options.width = particle->size;
+    draw_options.height = particle->size;
+    draw_options.r = particle->r;
+    draw_options.g = particle->g;
+    draw_options.b = particle->b;
+    draw_options.x = self->x;
+    draw_options.y = self->y;
+    draw_options.z = self->z;
 
     draw_quad(
         scene->draw_program_color,
-        particle->size, particle->size,
-        self->x, self->y, self->z,
-        particle->r, particle->g, particle->b, particle->a
+        draw_options
     );
 }

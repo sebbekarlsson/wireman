@@ -117,22 +117,24 @@ void main_scene_post_draw(scene_T* scene)
 
         glBindVertexArray(scene->VAO);
 
+        draw_options_T draw_options = DRAW_OPTIONS_INIT;
+        draw_options.texture = TEXTURE_ENTITY_SHEET->id;
+        draw_options.x = 8 + ((texture_width+1)*4) + (((32 + 1) * i));
+        draw_options.y = ((RES_HEIGHT-32) - 8);
+        draw_options.z = 4.0f;
+        draw_options.width = texture_width;
+        draw_options.height = texture_height;
+        draw_options.r = 255;
+        draw_options.g = 255;
+        draw_options.b = 255;
+        draw_options.shift_x = 0;
+        draw_options.shift_y = 14;
+        draw_options.atlas_width = 16;
+        draw_options.atlas_height = 16;
+
         draw_texture(
             scene->draw_program,
-            TEXTURE_ENTITY_SHEET->id,
-            8 + ((texture_width+1)*4) + (((32 + 1) * i)), ((RES_HEIGHT-32) - 8), 4.0f,
-            texture_width,
-            texture_height,
-            255,
-            255,
-            255,
-            1.0f,
-            0,
-            14,
-            16,
-            16,
-            0,
-            0
+            draw_options
         );
     }
 }
