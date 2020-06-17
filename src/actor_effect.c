@@ -19,7 +19,7 @@ actor_effect_T* init_actor_effect(float x, float y, float z, int type)
     {
         for (int i = 0; i < 4; i++)
         {
-            texture_T* texture = init_texture(TEXTURE_EFFECTS_SHEET->id, 32, 32);
+            texture_T* texture = init_texture(TEXTURE_EFFECTS_SHEET->id, (void*)0, 32, 32);
             texture->shift_x = 15;
             texture->shift_y = i;
             texture->atlas_width = 16;

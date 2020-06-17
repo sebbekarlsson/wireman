@@ -13,7 +13,7 @@ texture_T* TEXTURE_EFFECTS_SHEET;
 
 int main(int argc, char* argv[])
 {
-    APP = init_application(640, 480, 2, "App");
+    APP = init_application(640, 480, "App");
 
     TEXTURE_SHEET = texture_get("res/img/sheet.png");
     TEXTURE_ENTITY_SHEET = texture_get("res/img/entity_sheet.png");

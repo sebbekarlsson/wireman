@@ -10,7 +10,10 @@ extern texture_T* TEXTURE_ENTITY_SHEET;
 main_scene_T* init_main_scene()
 {
     main_scene_T* main_scene = calloc(1, sizeof(struct MAIN_SCENE_STRUCT));
-    scene_T* scene = scene_constructor((scene_T*) main_scene);
+    scene_T* scene = scene_constructor((scene_T*) main_scene, 2);
+    scene->r = 30;
+    scene->g = 60;
+    scene->b = 200;
 
     scene->tick = main_scene_tick;
     scene->pre_draw = main_scene_pre_draw;

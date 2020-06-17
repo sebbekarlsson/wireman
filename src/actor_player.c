@@ -31,7 +31,7 @@ actor_player_T* init_actor_player(float x, float y, float z)
 
     actor_player->health = 100.0f;
     
-    texture_T* texture_down = init_texture(TEXTURE_ENTITY_SHEET->id, TEXTURE_ENTITY_SHEET->width, TEXTURE_ENTITY_SHEET->height);
+    texture_T* texture_down = init_texture(TEXTURE_ENTITY_SHEET->id, (void*)0, TEXTURE_ENTITY_SHEET->width, TEXTURE_ENTITY_SHEET->height);
     texture_down->atlas_width = 16;
     texture_down->atlas_height = 16;
     texture_down->shift_x = 0;
@@ -44,7 +44,7 @@ actor_player_T* init_actor_player(float x, float y, float z)
     actor_player->sprite_side = init_sprite();
     actor_player->sprite_side->delay = 0.2f;
     
-    texture_T* texture_side = init_texture(TEXTURE_ENTITY_SHEET->id, TEXTURE_ENTITY_SHEET->width, TEXTURE_ENTITY_SHEET->height);
+    texture_T* texture_side = init_texture(TEXTURE_ENTITY_SHEET->id, (void*)0, TEXTURE_ENTITY_SHEET->width, TEXTURE_ENTITY_SHEET->height);
     texture_side->atlas_width = 16;
     texture_side->atlas_height = 16;
     texture_side->shift_x = 1;
@@ -57,7 +57,7 @@ actor_player_T* init_actor_player(float x, float y, float z)
     actor_player->sprite_up = init_sprite();
     actor_player->sprite_up->delay = 0.2f;
     
-    texture_T* texture_up = init_texture(TEXTURE_ENTITY_SHEET->id, TEXTURE_ENTITY_SHEET->width, TEXTURE_ENTITY_SHEET->height);
+    texture_T* texture_up = init_texture(TEXTURE_ENTITY_SHEET->id, (void*)0, TEXTURE_ENTITY_SHEET->width, TEXTURE_ENTITY_SHEET->height);
     texture_up->atlas_width = 16;
     texture_up->atlas_height = 16;
     texture_up->shift_x = 2;

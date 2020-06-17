@@ -21,7 +21,7 @@ block_T* init_block(int type)
     block->charge_dir = CHARGE_DIR_NONE;
     block_set_solid(block, type);
 
-    block->texture = init_texture(TEXTURE_SHEET->id, 32, 32);
+    block->texture = init_texture(TEXTURE_SHEET->id, (void*)0, 32, 32);
 
     block_tick(block); 
 
